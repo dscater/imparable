@@ -1,0 +1,529 @@
+:root {
+    --principal: #5cc72f;
+    --principal_hover: #48b619;
+    --secundario: #0d2649;
+    --white: #ffffff;
+    --white1: #f2f2f2;
+    --correcto: #d2e7c9;
+    --cancelado: rgb(159, 247, 166);
+    --bg__progreso: rgb(0, 180, 45);
+    --bg__primary: #409eff;
+    --bg__primary1: #488bd3;
+    --bg__primary2: #205080;
+    --bg__primary3: #0d2649;
+    --bg__primary4: #091220;
+    --bg__success: #67c23a;
+    --bg__success1: rgb(133.4, 206.2, 97.4);
+    --bg__success2: rgb(78.1, 141.8, 46.6);
+    --bg__success3: rgb(61.5, 107, 39);
+    --bg__success4: rgb(44.9, 72.2, 31.4);
+    --bg__success4: rgb(36.6, 54.8, 27.6);
+    --bg__warning: #e6a23c;
+    --bg__warning1: rgb(235, 181, 99);
+    --bg__warning2: rgb(167, 119.4, 48);
+    --bg__warning3: #7d5b28;
+    --bg__danger: #f56c6c;
+    --bg__danger1: rgb(247, 137.4, 137.4);
+    --bg__danger2: rgb(177.5, 81.6, 81.6);
+    --bg__danger3: rgb(132.5, 64, 64);
+    --bg__dark: #909399;
+    --bg__dark1: rgb(166.2, 168.6, 173.4);
+    --bg__dark2: rgb(106.8, 108.9, 113.1);
+    --bg__dark3: rgb(82, 83.5, 86.5);
+    --bg__dark4: rgb(57.2, 58.1, 59.9);
+    --bg__dark5: rgb(44.8, 45.4, 46.6);
+    --bg__dark6: rgb(32.4, 32.7, 33.3);
+}
+
+html {
+    overflow-y: scroll;
+    overflow-y: overlay;
+    min-height: 100vh;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+}
+
+.login-page {
+    min-height: 100vh;
+}
+
+/* FORMULARIO */
+.oculto{
+    display: none;
+}
+
+label.required::after {
+    font-family: "Epunda_Slab";
+    font-weight: 400;
+    content: " (*)";
+    color: red;
+}
+
+.parsley-errors-list li {
+    color: var(--bg__danger);
+}
+
+.form-control.parsley-error{
+    border-color: var(--bg__danger);
+}
+
+/* MIS ESTILOS */
+
+.bg__primary {
+    background-color: var(--bg__primary);
+    color: white;
+}
+.bg__primary1 {
+    background-color: var(--bg__primary1);
+    color: white;
+}
+.bg__primary2 {
+    background-color: var(--bg__primary2);
+    color: white;
+}
+.bg__primary3 {
+    background-color: var(--bg__primary3);
+    color: white;
+}
+
+.bg__success {
+    background-color: var(--bg__success);
+    color: white;
+}
+.bg__success1 {
+    background-color: var(--bg__success1);
+    color: white;
+}
+.bg__success2 {
+    background-color: var(--bg__success2);
+    color: white;
+}
+.bg__success3 {
+    background-color: var(--bg__success3);
+    color: white;
+}
+.bg__success4 {
+    background-color: var(--bg__success4);
+    color: white;
+}
+.bg__success5 {
+    background-color: var(--bg__success5);
+    color: white;
+}
+
+.bg__warning {
+    background-color: var(--bg__warning);
+    color: white;
+}
+.bg__warning1 {
+    background-color: var(--bg__warning1);
+    color: white;
+}
+.bg__warning2 {
+    background-color: var(--bg__warning2);
+    color: white;
+}
+.bg__warning3 {
+    background-color: var(--bg__warning3);
+    color: white;
+}
+
+.bg__danger {
+    background-color: var(--bg__danger);
+    color: white;
+}
+
+.bg__danger1 {
+    background-color: var(--bg__danger1);
+    color: white;
+}
+
+.bg__danger2 {
+    background-color: var(--bg__danger2);
+    color: white;
+}
+
+.bg__danger3 {
+    background-color: var(--bg__danger3);
+    color: white;
+}
+
+.bg__dark {
+    background-color: var(--bg__dark);
+    color: white;
+}
+
+.bg__dark1 {
+    background-color: var(--bg__dark1);
+    color: white;
+}
+.bg__dark2 {
+    background-color: var(--bg__dark2);
+    color: white;
+}
+.bg__dark3 {
+    background-color: var(--bg__dark3);
+    color: white;
+}
+.bg__dark4 {
+    background-color: var(--bg__dark4);
+    color: white;
+}
+.bg__dark5 {
+    background-color: var(--bg__dark5);
+    color: white;
+}
+.bg__dark5 {
+    background-color: var(--bg__dark5);
+    color: white;
+}
+
+.content-table table .mi-celda.bg-proceso {
+    background-color: var(--bg__primary);
+    color: white;
+}
+.content-table table .mi-celda.bg-enviado {
+    background-color: var(--bg__warning);
+    color: var(--white1);
+}
+.content-table table .mi-celda.bg-concluido {
+    background-color: var(--bg__success);
+    color: var(--white1);
+    font-weight: bold;
+}
+
+.cont_barra_progreso {
+    width: 100%;
+    height: 14px;
+    background-color: var(--bg__danger);
+    position: relative;
+    transition: all 43s ease-in;
+    text-align: center;
+    z-index: 0;
+}
+
+.cont_barra_progreso span {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: rgb(243, 243, 243);
+    position: relative;
+    top: -0.2rem;
+}
+
+.bara_prog {
+    background-color: var(--bg__progreso);
+    height: 100%;
+    position: absolute;
+    width: 0%;
+    left: 0;
+    top: 0;
+    transition: all 43s ease-in;
+    z-index: -1;
+}
+
+.contenedor_opciones {
+    width: 100%;
+    border: solid 1px;
+}
+
+.bg-cancelado {
+    background-color: var(--cancelado);
+}
+tr.bg-cancelado {
+    border-bottom: solid 2px;
+}
+
+body .btn-primary,
+body .btn-primary:active,
+body .btn-primary:focus,
+body .badge-primary,
+body .bg-primary,
+body li a.bg-primary,
+body a.bg-primary,
+body .pagination .page-item.active .page-link,
+body .main-sidebar .sidebar .nav .nav-link.active {
+    background-color: var(--principal);
+    border-radius: 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+body .btn-primary:disabled {
+    background-color: var(--cancelado);
+}
+
+body li a.bg-primary,
+body a.bg-primary,
+body .pagination .page-item.active .page-link,
+body .btn-primary {
+    border-color: var(--principal_hover);
+}
+body .btn-primary:hover {
+    background-color: var(--principal_hover);
+    border-color: var(--principal);
+}
+
+/* Botón si el icono es success */
+.swal2-confirm.btn-sucess {
+    background-color: var(--principal) !important;
+}
+
+/* Botón si el icono es error */
+.swal2-confirm.btn-error {
+    background-color: var(--bg__danger) !important;
+}
+
+/* Botón si el icono es warning */
+.swal2-confirm.btn-warning {
+    background-color: var(--principal) !important;
+    color: #000 !important;
+}
+
+.swal2-confirm.swal2-styled.swal2-default-outline {
+    border-radius: 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* ELEMENT-UI */
+.el-select.el-select--large {
+    height: 38px;
+}
+.el-select-dropdown {
+    max-width: 900px;
+}
+
+.el-select.is-invalid .el-select__wrapper {
+    box-shadow: 0 0 0 1px #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* .el-select.el-select--large .el-select__wrapper{
+    padding: 0px 10px;
+    height: 20px;
+} */
+
+/* MODAL */
+
+.modal.show {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* SWAL */
+
+.swal2-confirm.swal2-styled.swal2-default-outline,
+.swal2-cancel.swal2-styled {
+    color: white;
+}
+
+/* TABLES */
+body table.table.mitabla.tablaFixeada thead tr {
+    box-shadow: none;
+}
+
+body table.table tbody tr .accion .btn.accion_icon {
+    width: 40px;
+    margin: 1px;
+}
+
+body table.table tbody tr td {
+    vertical-align: middle;
+}
+
+body .mi-table thead.bg__primary tr th {
+    color: var(--white);
+    background-color: var(--secundario);
+}
+
+body .mi-table table thead tr th .iheader .accion {
+    color: var(--white1);
+}
+
+body .mi-table table thead tr th .iheader .accion.active {
+    color: var(--white);
+}
+
+/* CONTENT WRAPPER */
+.content-wrapper {
+    background-color: var(--white1);
+}
+
+/* MODIFICAICÓN ESTILOS ADMINLTE */
+.hold-transition .content-wrapper,
+.hold-transition .control-sidebar,
+.hold-transition .control-sidebar *,
+.hold-transition .main-footer,
+.hold-transition .main-header,
+.hold-transition .main-sidebar,
+.hold-transition .main-sidebar * {
+    transition: all 0.2s ease-in-out !important;
+}
+
+.nav-sidebar .nav-treeview {
+    height: 0;
+    display: block;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+}
+
+/* body .nav-sidebar .nav-item .nav-link.sub-menu.active i.right, */
+body .nav-sidebar .nav-item .nav-link.sub-menu.menu-is-opening i.right {
+    -webkit-transform: rotate(-90deg) !important;
+    transform: rotate(-90deg) !important;
+}
+
+.loading {
+    position: fixed;
+    top: -200vh;
+    left: 0;
+    z-index: 6050;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    transition: all 0.7s ease-in-out;
+}
+
+.loading::before {
+    content: "";
+    position: absolute;
+    top: -200vh;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.87);
+    z-index: -1;
+    filter: blur(2px);
+    transition: all 0.7s ease-in-out;
+}
+
+.loading.show {
+    top: 0;
+    height: 100vh;
+}
+
+.loading.show::before {
+    top: 0;
+}
+
+.sub-menu.menu-open,
+.sub-menu.menu-open .nav-link.active:hover {
+    color: black;
+}
+
+body .main-sidebar .sidebar .nav.nav-treeview .nav-link.active,
+body .main-sidebar .sidebar .nav.nav-treeview .nav-link.active:focus,
+body .main-sidebar .sidebar .nav.nav-treeview .nav-link.active:hover {
+    background: var(--white1);
+    color: var(--bg__dark3);
+}
+
+.modal-title {
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+body label {
+    margin-bottom: 0px;
+}
+
+.error.invalid-feedback {
+    margin-top: 0px;
+}
+
+body input,
+body select,
+body textarea,
+body input.form-control,
+body select.form-control,
+body select.form-select,
+body textarea.form-control {
+    font-size: 0.8rem;
+}
+
+body table thead tr th,
+body table tbody tr td {
+    font-size: 0.76rem;
+}
+
+body a,
+body a.btn,
+body button,
+body button.btn {
+    font-size: 0.82rem;
+}
+
+body .input-group button.btn {
+    font-size: 1rem;
+}
+
+body a:focus,
+body button:focus,
+body a:active,
+body button:active {
+    box-shadow: none;
+}
+
+body .content ul li a:focus,
+body .content ul li button:focus,
+body .content ul li a:active,
+body .content ul li button:active {
+    box-shadow: none;
+}
+
+/* BREADCRUMB */
+.content-header .breadcrumb {
+    padding: 5px 10px;
+    background: var(--secundario);
+}
+
+.content-header .breadcrumb li a {
+    color: var(--white);
+    font-size: 0.85rem;
+}
+
+.content-header .breadcrumb-item.active {
+    color: var(--principal);
+}
+/* LOGIN */
+body.app-blank.login {
+    background-color: var(--bg__dark6);
+}
+/* TEXTOS */
+.title_expressive {
+    font-family: "Epunda_Slab";
+    font-weight: 900;
+}
+
+.title_Chau_Philomene_One {
+    font-family: "Chau_Philomene_One";
+    font-weight: 900;
+}
+
+.text-black {
+    color: var(--bg__dark6);
+}
+.text-white {
+    color: var(--white);
+}
+
+.text-white1 {
+    color: var(--white1);
+}
+
+.text-center {
+    text-align: center;
+}
