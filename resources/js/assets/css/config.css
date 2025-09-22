@@ -51,7 +51,7 @@ body {
 }
 
 /* FORMULARIO */
-.oculto{
+.oculto {
     display: none;
 }
 
@@ -66,7 +66,7 @@ label.required::after {
     color: var(--bg__danger);
 }
 
-.form-control.parsley-error{
+.form-control.parsley-error {
     border-color: var(--bg__danger);
 }
 
@@ -289,8 +289,10 @@ body .btn-primary:hover {
 }
 
 /* ELEMENT-UI */
-.el-select.el-select--large {
-    height: 38px;
+.el-select.el-select--large .el-select__wrapper {
+    height: 38px !important;
+    min-height: 38px !important;
+    line-height: 1.5 !important;
 }
 .el-select-dropdown {
     max-width: 900px;

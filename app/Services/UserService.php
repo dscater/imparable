@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -14,6 +16,111 @@ class UserService
 
     public function __construct(private  CargarArchivoService $cargarArchivoService, private HistorialAccionService $historialAccionService) {}
 
+
+    /**
+     * Lista de users paginado con filtros
+     *
+     * @param integer $length
+     * @param integer $page
+     * @param string $search
+     * @param array $columnsSerachLike
+     * @param array $columnsFilter
+     * @return LengthAwarePaginator
+     */
+    public function listadoPaginado(int $length, int $page, string $search, array $columnsSerachLike = [], array $columnsFilter = [], array $columnsBetweenFilter = [], array $orderBy = []): LengthAwarePaginator
+    {
+        $users = User::select("users.*")
+            ->join("personas", "personas.id", "=", "users.persona_id")->where("users.id", "!=", 1);
+
+        $users->where("users.status", 1);
+
+        // Filtros exactos
+        foreach ($columnsFilter as $key => $value) {
+            if (!is_null($value)) {
+                $users->where("users.$key", $value);
+            }
+        }
+
+        // Filtros por rango
+        foreach ($columnsBetweenFilter as $key => $value) {
+            if (isset($value[0], $value[1])) {
+                $users->whereBetween("users.$key", $value);
+            }
+        }
+
+        // Búsqueda en múltiples columnas con LIKE
+        if (!empty($search) && !empty($columnsSerachLike)) {
+            $users->where(function ($query) use ($search, $columnsSerachLike) {
+                foreach ($columnsSerachLike as $col) {
+                    $query->orWhere("$col", "LIKE", "%$search%");
+                }
+            });
+        }
+
+        // Ordenamiento
+        foreach ($orderBy as $value) {
+            if (isset($value[0], $value[1])) {
+                $users->orderBy($value[0], $value[1]);
+            }
+        }
+
+
+        $users = $users->paginate($length, ['*'], 'page', $page);
+        return $users;
+    }
+
+
+    /**
+     * Lista de users paginado con filtros (eliminados)
+     *
+     * @param integer $length
+     * @param integer $page
+     * @param string $search
+     * @param array $columnsSerachLike
+     * @param array $columnsFilter
+     * @return LengthAwarePaginator
+     */
+    public function listadoPaginadoEliminados(int $length, int $page, string $search, array $columnsSerachLike = [], array $columnsFilter = [], array $columnsBetweenFilter = [], array $orderBy = []): LengthAwarePaginator
+    {
+        $users = User::select("users.*")->where("id", "!=", 1);
+
+        $users->where("status", 0);
+
+        // Filtros exactos
+        foreach ($columnsFilter as $key => $value) {
+            if (!is_null($value)) {
+                $users->where("users.$key", $value);
+            }
+        }
+
+        // Filtros por rango
+        foreach ($columnsBetweenFilter as $key => $value) {
+            if (isset($value[0], $value[1])) {
+                $users->whereBetween("users.$key", $value);
+            }
+        }
+
+        // Búsqueda en múltiples columnas con LIKE
+        if (!empty($search) && !empty($columnsSerachLike)) {
+            $users->where(function ($query) use ($search, $columnsSerachLike) {
+                foreach ($columnsSerachLike as $col) {
+                    $query->orWhere("users.$col", "LIKE", "%$search%");
+                }
+            });
+        }
+
+        // Ordenamiento
+        foreach ($orderBy as $value) {
+            if (isset($value[0], $value[1])) {
+                $users->orderBy($value[0], $value[1]);
+            }
+        }
+
+
+        $users = $users->paginate($length, ['*'], 'page', $page);
+        return $users;
+    }
+
     /**
      * Obtener nombre de usuario
      *
@@ -21,7 +128,7 @@ class UserService
      * @param string $apep
      * @return string
      */
-    public function getNombreUsuario(string $nom, string $apep): string
+    public function getNombreUsuario(string $nom, string $apep, int $id = 0): string
     {
         //determinando el nombre de usuario inicial del 1er_nombre+apep+tipoUser
         $cont = 0;
@@ -34,7 +141,14 @@ class UserService
                 $nombre_user = $nombre_user . $cont;
             }
             $cont++;
-        } while (User::where('usuario', $nombre_user)->get()->first());
+
+            $existe = User::where('usuario', $nombre_user)->get()->first();
+            if ($id > 0 && $existe) {
+                if ($existe->id == $id) {
+                    $existe = false;
+                }
+            }
+        } while ($existe);
         return $nombre_user;
     }
     /**
@@ -45,17 +159,11 @@ class UserService
      */
     public function crear(array $datos): User
     {
+        $persona = Persona::findOrFail($datos["persona_id"]);
         $user = User::create([
-            "usuario" => $this->getNombreUsuario($datos["nombre"], $datos["paterno"]),
-            "nombre" => mb_strtoupper($datos["nombre"]),
-            "paterno" => mb_strtoupper($datos["paterno"]),
-            "materno" => mb_strtoupper($datos["materno"]),
-            "dir" => mb_strtoupper($datos["dir"]),
-            "ci" => $datos["ci"],
-            "ci_exp" => $datos["ci_exp"],
-            "fono" => $datos["fono"],
-            "correo" => $datos["correo"],
-            "password" => $datos["ci"],
+            "persona_id" => $persona->id,
+            "usuario" => $this->getNombreUsuario($persona->nombre, $persona->paterno),
+            "password" => $persona->ci,
             "tipo" => $datos["tipo"],
             "acceso" => $datos["acceso"],
             "fecha_registro" => date("Y-m-d")
@@ -81,17 +189,12 @@ class UserService
      */
     public function actualizar(array $datos, User $user): User
     {
-        $old_user = User::find($user->id);
-
+        $old_user = clone $user;
+        $persona = Persona::findOrFail($datos["persona_id"]);
         $user->update([
-            "nombre" => mb_strtoupper($datos["nombre"]),
-            "paterno" => mb_strtoupper($datos["paterno"]),
-            "materno" => mb_strtoupper($datos["materno"]),
-            "dir" => mb_strtoupper($datos["dir"]),
-            "ci" => $datos["ci"],
-            "ci_exp" => $datos["ci_exp"],
-            "fono" => $datos["fono"],
-            "correo" => $datos["correo"],
+            "persona_id" => $persona->id,
+            "usuario" => $this->getNombreUsuario($persona->nombre, $persona->paterno, $user->id),
+            "password" => $persona->ci,
             "tipo" => $datos["tipo"],
             "acceso" => $datos["acceso"],
             "fecha_registro" => date("Y-m-d")
@@ -155,6 +258,39 @@ class UserService
 
         // registrar accion
         $this->historialAccionService->registrarAccion($this->modulo, "ELIMINACIÓN", "ELIMINÓ AL USUARIO " . $old_user->usuario, $old_user, $user);
+        return true;
+    }
+
+    /**
+     * Reestablecer user
+     *
+     * @param User $user
+     * @return boolean
+     */
+    public function reestablecer(User $user): bool
+    {
+        $old_user = clone $user;
+        $user->status = 1;
+        $user->save();
+
+        // registrar accion
+        $this->historialAccionService->registrarAccion($this->modulo, "REESTABLECER", "REESTABLECIÓ EL REGISTRO DE UN USUARIO " . $old_user->usuario, $old_user, $user);
+        return true;
+    }
+
+    /**
+     * Eliminación permanente de user
+     *
+     * @param User $user
+     * @return boolean
+     */
+    public function eliminacion_permanente(User $user): bool
+    {
+        $old_user = clone $user;
+        $user->delete();
+
+        // registrar accion
+        $this->historialAccionService->registrarAccion($this->modulo, "ELIMINACIÓN PERMANENTE", "ELIMINÓ PERMANENTEMENTE EL REGISTRO DE UN USUARIO " . $old_user->usuario, $old_user);
         return true;
     }
 }

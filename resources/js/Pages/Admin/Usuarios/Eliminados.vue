@@ -10,7 +10,7 @@ import { useAppStore } from "@/stores/aplicacion/appStore";
 import { useAxios } from "@/composables/axios/useAxios";
 const { props: props_page } = usePage();
 const appStore = useAppStore();
-const { axiosDelete } = useAxios();
+const { axiosDelete, axiosPost } = useAxios();
 
 onBeforeMount(() => {
     appStore.startLoading();
@@ -88,7 +88,6 @@ const headers = [
         key: "acceso",
         keySortable: "acceso",
         sortable: true,
-        width:"11%"
     },
     {
         label: "ACCIÓN",
@@ -121,10 +120,37 @@ const updateDatatable = async () => {
     }
 };
 
+const restaurar = (item) => {
+    Swal.fire({
+        title: "¿Quierés resturar este registro?",
+        html: `<strong>${item.full_name}</strong>`,
+        showCancelButton: true,
+        confirmButtonText: "Si, restaurar",
+        cancelButtonText: "No, cancelar",
+        denyButtonText: `No, cancelar`,
+        customClass: {
+            confirmButton: "btn-success",
+        },
+    }).then(async (result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            let respuesta = await axiosPost(
+                route("usuarios.reestablecer", item.id),
+                {
+                    _method: "patch",
+                }
+            );
+            if (respuesta && respuesta.sw) {
+                updateDatatable();
+            }
+        }
+    });
+};
+
 const eliminarUsuario = (item) => {
     Swal.fire({
-        title: "¿Quierés eliminar este registro?",
-        html: `<strong>${item.full_name}</strong>`,
+        title: "¿Quierés eliminar definitivamente este registro?",
+        html: `<strong>${item.full_name}</strong><br/>Esta acción no se puede deshacer.`,
         showCancelButton: true,
         confirmButtonText: "Si, eliminar",
         cancelButtonText: "No, cancelar",
@@ -136,7 +162,7 @@ const eliminarUsuario = (item) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
             let respuesta = await axiosDelete(
-                route("usuarios.destroy", item.id)
+                route("usuarios.eliminacion_permanente", item.id)
             );
             if (respuesta && respuesta.sw) {
                 updateDatatable();
@@ -156,7 +182,9 @@ onMounted(async () => {
         <template #header>
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Usuarios</h1>
+                    <h1 class="m-0 text-lg">
+                        Usuarios <small>> Eliminados</small>
+                    </h1>
                 </div>
                 <!-- /.col -->
                 <div class="col-sm-6">
@@ -164,7 +192,12 @@ onMounted(async () => {
                         <li class="breadcrumb-item">
                             <Link :href="route('inicio')">Inicio</Link>
                         </li>
-                        <li class="breadcrumb-item active">Usuarios</li>
+                        <li class="breadcrumb-item">
+                            <Link :href="route('usuarios.index')"
+                                >Usuarios</Link
+                            >
+                        </li>
+                        <li class="breadcrumb-item active">Eliminados</li>
                     </ol>
                 </div>
                 <!-- /.col -->
@@ -193,13 +226,13 @@ onMounted(async () => {
                             v-if="
                                 props_page.auth?.user.permisos == '*' ||
                                 props_page.auth?.user.permisos.includes(
-                                    'usuarios.eliminados'
+                                    'usuarios.index'
                                 )
                             "
-                            class="btn btn-outline-danger mx-1"
-                            :href="route('usuarios.eliminados')"
+                            class="btn btn-outline-dark mx-1"
+                            :href="route('usuarios.index')"
                         >
-                            <i class="fa fa-trash"></i> Eliminados
+                            <i class="fa fa-arrow-left"></i> Volver
                         </Link>
                     </div>
                     <div class="col-md-8 my-1">
@@ -234,13 +267,12 @@ onMounted(async () => {
                             ref="miTable"
                             :cols="headers"
                             :api="true"
-                            :url="route('usuarios.paginado')"
+                            :url="route('usuarios.paginado_eliminados')"
                             :numPages="5"
                             :multiSearch="multiSearch"
                             :syncOrderBy="'id'"
                             :syncOrderAsc="'DESC'"
                             table-responsive
-                            :header-class="'bg__primary'"
                             fixed-header
                         >
                             <template #foto="{ item }">
@@ -271,40 +303,36 @@ onMounted(async () => {
                                 <el-tooltip
                                     class="box-item"
                                     effect="dark"
-                                    content="Editar"
+                                    content="Restaurar"
                                     placement="left-start"
                                 >
                                     <button
-                                        class="btn btn-warning"
-                                        @click="
-                                            setUsuario(item);
-                                            accion_formulario = 1;
-                                            muestra_formulario = true;
-                                        "
+                                        class="btn btn-success"
+                                        @click="restaurar(item)"
                                         v-if="
-                                            props_page.auth?.user.permisos ==
+                                            props_page.auth.user.permisos ==
                                                 '*' ||
                                             props_page.auth?.user.permisos.includes(
-                                                'personas.edit'
+                                                'personas.reestablecer'
                                             )
                                         "
                                     >
-                                        <i class="fa fa-pen"></i></button
+                                        <i class="fa fa-sync"></i></button
                                 ></el-tooltip>
                                 <el-tooltip
                                     class="box-item"
                                     effect="dark"
-                                    content="Eliminar"
+                                    content="Eliminar definitivamente"
                                     placement="left-start"
                                 >
                                     <button
                                         class="btn btn-danger"
                                         @click="eliminarUsuario(item)"
                                         v-if="
-                                            props_page.auth?.user.permisos ==
+                                            props_page.auth.user.permisos ==
                                                 '*' ||
                                             props_page.auth?.user.permisos.includes(
-                                                'personas.destroy'
+                                                'personas.eliminacion_permanente'
                                             )
                                         "
                                     >

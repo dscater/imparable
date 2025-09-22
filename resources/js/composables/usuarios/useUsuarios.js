@@ -18,9 +18,10 @@ export const useUsuarios = () => {
             oUsuario.value.persona_id = item.persona_id;
             oUsuario.value.usuario = item.usuario;
             oUsuario.value.password = item.password;
-            oUsuario.value.acceso = item.acceso;
+            oUsuario.value.acceso = "" + item.acceso;
             oUsuario.value.tipo = item.tipo;
-            oUsuario.value.foto = item.foto;
+            oUsuario.value.foto = "";
+            oUsuario.value.persona = item.persona;
             oUsuario.value._method = "PUT";
             return oUsuario;
         }

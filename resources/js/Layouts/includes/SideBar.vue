@@ -54,9 +54,10 @@ onUnmounted(() => {});
                 class="brand-image img-circle elevation-3"
                 style="opacity: 0.8"
             />
-            <span class="brand-text font-weight-light title_Chau_Philomene_One">{{
-                configuracionStore.oConfiguracion.nombre_sistema
-            }}</span>
+            <span
+                class="brand-text font-weight-light title_Chau_Philomene_One"
+                >{{ configuracionStore.oConfiguracion.nombre_sistema }}</span
+            >
         </a>
 
         <!-- Sidebar -->
@@ -75,22 +76,6 @@ onUnmounted(() => {});
                 </div>
             </div>
 
-            <!-- SidebarSearch Form -->
-            <div class="form-inline">
-                <div class="input-group" data-widget="sidebar-search">
-                    <input
-                        class="form-control form-control-sidebar"
-                        type="search"
-                        placeholder="Buscar"
-                        aria-label="Buscar"
-                    />
-                    <div class="input-group-append">
-                        <button class="btn btn-sidebar">
-                            <i class="fas fa-search fa-fw"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul
@@ -104,7 +89,7 @@ onUnmounted(() => {});
                         :ruta="'inicio'"
                         :icon="'fa fa-home'"
                     ></ItemMenu>
-                    <li class="nav-header font-weight-bold bg-navy ">
+                    <li class="nav-header font-weight-bold bg-navy">
                         OPERACIONES
                     </li>
                     <ItemMenu
@@ -154,6 +139,11 @@ onUnmounted(() => {});
                         :label="'Productos y servicios'"
                         :ruta="'producto_servicios.index'"
                         :icon="'fa fa-table'"
+                    ></ItemMenu>
+                    <ItemMenu
+                        :label="'Proveedores'"
+                        :ruta="'proveedors.index'"
+                        :icon="'fa fa-list-alt'"
                     ></ItemMenu>
                     <li class="nav-header font-weight-bold bg-navy">
                         REPORTES

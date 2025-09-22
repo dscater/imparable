@@ -18,6 +18,10 @@ class PermisoService
             "usuarios.update",
             "usuarios.destroy",
             "usuarios.password",
+            "usuarios.eliminados",
+            "usuarios.paginado_eliminados",
+            "usuarios.reestablecer",
+            "usuarios.eliminacion_permanente",
 
             "personas.listado",
             "personas.paginado",

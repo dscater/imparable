@@ -49,7 +49,7 @@
     @inertiaHead
 </head>
 
-<body class="app-blank">
+<body class="app-blank layout-fixed">
     @inertia
 </body>
 

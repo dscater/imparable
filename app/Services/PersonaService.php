@@ -15,6 +15,18 @@ class PersonaService
     public function __construct(private  CargarArchivoService $cargarArchivoService, private HistorialAccionService $historialAccionService) {}
 
 
+    public function listado(string $search): array
+    {
+        return Persona::where("status", 1)
+            ->where(function ($query) use ($search) {
+                $query->where("ci", "LIKE", "%$search%")
+                    ->orWhereRaw("CONCAT(nombre, ' ', paterno, ' ', materno) LIKE ?", ["%$search%"]);
+            })
+            ->orderBy("nombre")
+            ->get()
+            ->toArray();
+    }
+
     /**
      * Lista de personas paginado con filtros
      *

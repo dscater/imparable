@@ -67,25 +67,27 @@ class UsuarioController extends Controller
     }
     public function paginado(Request $request)
     {
-        $search = $request->search;
-        $usuarios = User::where("id", "!=", 1);
+        $perPage = $request->perPage;
+        $page = (int)($request->input("page", 1));
+        $search = (string)$request->input("search", "");
+        $orderByCol = $request->orderByCol;
+        $desc = $request->desc;
 
-        if (trim($search) != "") {
-            $usuarios->where("nombre", "LIKE", "%$search%");
-            $usuarios->orWhere("paterno", "LIKE", "%$search%");
-            $usuarios->orWhere("materno", "LIKE", "%$search%");
-            $usuarios->orWhere("ci", "LIKE", "%$search%");
+        $columnsSerachLike = ["personas.nombre", "personas.paterno", "personas.materno", "personas.ci", "personas.fono", "personas.dir"];
+        $columnsFilter = [];
+        $columnsBetweenFilter = [];
+        $arrayOrderBy = [];
+        if ($orderByCol && $desc) {
+            $arrayOrderBy = [
+                [$orderByCol, $desc]
+            ];
         }
 
-        if ($request->orderBy && $request->orderAsc) {
-            $usuarios->orderBy($request->orderBy, $request->orderAsc);
-        }
-
-        $usuarios = $usuarios->where("status", 1)->paginate($request->perPage);
+        $personas = $this->userService->listadoPaginado($perPage, $page, $search, $columnsSerachLike, $columnsFilter, $columnsBetweenFilter, $arrayOrderBy);
         return response()->JSON([
-            'data' => $usuarios->items(),
-            'total' => $usuarios->total(),
-            'lastPage' => $usuarios->lastPage(),
+            "data" => $personas->items(),
+            "total" => $personas->total(),
+            "lastPage" => $personas->lastPage()
         ]);
     }
 
@@ -112,7 +114,7 @@ class UsuarioController extends Controller
 
     public function show(User $user)
     {
-        return response()->JSON($user);
+        return response()->JSON($user->load("persona"));
     }
 
     public function actualizaAcceso(User $user, Request $request)
@@ -179,6 +181,96 @@ class UsuarioController extends Controller
             return response()->JSON([
                 'sw' => true,
                 'message' => 'El registro se eliminó correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw ValidationException::withMessages([
+                'error' =>  $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Página eliminados
+     *
+     * @return Response
+     */
+    public function eliminados(): InertiaResponse
+    {
+        return Inertia::render("Admin/Usuarios/Eliminados");
+    }
+
+    /**
+     * Listado Páginado de personas eliminados
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function paginado_eliminados(Request $request): JsonResponse
+    {
+        $perPage = $request->perPage;
+        $page = (int)($request->input("page", 1));
+        $search = (string)$request->input("search", "");
+        $orderByCol = $request->orderByCol;
+        $desc = $request->desc;
+
+        $columnsSerachLike = ["nombre", "paterno", "materno", "ci", "fono", "dir"];
+        $columnsFilter = [];
+        $columnsBetweenFilter = [];
+        $arrayOrderBy = [];
+        if ($orderByCol && $desc) {
+            $arrayOrderBy = [
+                [$orderByCol, $desc]
+            ];
+        }
+
+        $personas = $this->userService->listadoPaginadoEliminados($perPage, $page, $search, $columnsSerachLike, $columnsFilter, $columnsBetweenFilter, $arrayOrderBy);
+        return response()->JSON([
+            "data" => $personas->items(),
+            "total" => $personas->total(),
+            "lastPage" => $personas->lastPage()
+        ]);
+    }
+
+    /**
+     * Reestablecer una persona
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function reestablecer(User $user)
+    {
+        DB::beginTransaction();
+        try {
+            $this->userService->reestablecer($user);
+            DB::commit();
+            return response()->JSON([
+                'sw' => true,
+                'message' => 'El registro se reestableció correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw ValidationException::withMessages([
+                'error' =>  $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Eliminación permanente de una user
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function eliminacion_permanente(User $user)
+    {
+        DB::beginTransaction();
+        try {
+            $this->userService->eliminacion_permanente($user);
+            DB::commit();
+            return response()->JSON([
+                'sw' => true,
+                'message' => 'El registro se eliminó permanentemente'
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();

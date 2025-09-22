@@ -79,7 +79,6 @@ Route::middleware(['auth', 'permisoUsuario'])->prefix("admin")->group(function (
 
 
     // PERSONAS
-    Route::get("personas/api", [PersonaController::class, 'api'])->name("personas.api");
     Route::get("personas/paginado", [PersonaController::class, 'paginado'])->name("personas.paginado");
     Route::get("personas/listado", [PersonaController::class, 'listado'])->name("personas.listado");
     Route::get("personas/eliminados", [PersonaController::class, 'eliminados'])->name("personas.eliminados");
@@ -91,9 +90,12 @@ Route::middleware(['auth', 'permisoUsuario'])->prefix("admin")->group(function (
     );
 
     // USUARIOS
-    Route::get("usuarios/clientes", [UsuarioController::class, 'clientes'])->name("usuarios.clientes");
+
+    Route::get("usuarios/eliminados", [UsuarioController::class, 'eliminados'])->name("usuarios.eliminados");
+    Route::get("usuarios/paginado_eliminados", [UsuarioController::class, 'paginado_eliminados'])->name("usuarios.paginado_eliminados");
+    Route::patch("usuarios/reestablecer/{user}", [UsuarioController::class, 'reestablecer'])->name("usuarios.reestablecer");
+    Route::delete("usuarios/eliminacion_permanente/{user}", [UsuarioController::class, 'eliminacion_permanente'])->name("usuarios.eliminacion_permanente");
     Route::put("usuarios/password/{user}", [UsuarioController::class, 'actualizaPassword'])->name("usuarios.password");
-    Route::get("usuarios/api_clientes", [UsuarioController::class, 'api_clientes'])->name("usuarios.api_clientes");
     Route::get("usuarios/api", [UsuarioController::class, 'api'])->name("usuarios.api");
     Route::get("usuarios/paginado", [UsuarioController::class, 'paginado'])->name("usuarios.paginado");
     Route::get("usuarios/listado", [UsuarioController::class, 'listado'])->name("usuarios.listado");

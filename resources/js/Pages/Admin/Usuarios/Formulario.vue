@@ -29,6 +29,16 @@ watch(
                 .getElementsByTagName("body")[0]
                 .classList.add("modal-open");
             form = useForm(oUsuario.value);
+            console.log(oUsuario.value)
+            console.log("AAAAAAAAAAAAA")
+            options.value = [
+                {
+                    value: oUsuario.value.persona_id,
+                    label: oUsuario.value.persona
+                        ? `${oUsuario.value.persona.full_name} - ${oUsuario.value.persona.ci}`
+                        : "Cargando...",
+                },
+            ];
         } else {
             document
                 .getElementsByTagName("body")[0]
@@ -50,17 +60,6 @@ const listTipos = ref([
     { value: "GERENTE", label: "GERENTE" },
     { value: "EMPLEADO", label: "EMPLEADO" },
 ]);
-const listExpedido = [
-    { value: "LP", label: "La Paz" },
-    { value: "CB", label: "Cochabamba" },
-    { value: "SC", label: "Santa Cruz" },
-    { value: "CH", label: "Chuquisaca" },
-    { value: "OR", label: "Oruro" },
-    { value: "PT", label: "Potosi" },
-    { value: "TJ", label: "Tarija" },
-    { value: "PD", label: "Pando" },
-    { value: "BN", label: "Beni" },
-];
 const foto = ref(null);
 
 function cargaArchivo(e, key) {
@@ -112,17 +111,32 @@ const enviarFormulario = () => {
         },
         onError: (err, code) => {
             console.log(code ?? "");
-            const error =
-                "Ocurrió un error inesperado contactese con el Administrador";
-            Swal.fire({
-                icon: "info",
-                title: "Error",
-                html: `<strong>${error}</strong>`,
-                confirmButtonText: `Aceptar`,
-                customClass: {
-                    confirmButton: "btn-error",
-                },
-            });
+            console.log(form.errors);
+            if (form.errors) {
+                const error =
+                    "Existen errores en el formulario, por favor verifique";
+                Swal.fire({
+                    icon: "info",
+                    title: "Error",
+                    html: `<strong>${error}</strong>`,
+                    confirmButtonText: `Aceptar`,
+                    customClass: {
+                        confirmButton: "btn-error",
+                    },
+                });
+            } else {
+                const error =
+                    "Ocurrió un error inesperado contactese con el Administrador";
+                Swal.fire({
+                    icon: "info",
+                    title: "Error",
+                    html: `<strong>${error}</strong>`,
+                    confirmButtonText: `Aceptar`,
+                    customClass: {
+                        confirmButton: "btn-error",
+                    },
+                });
+            }
             console.log("error: " + err.error);
         },
         onFinish: () => {
@@ -139,17 +153,37 @@ watch(muestra_form, (newVal) => {
     }
 });
 
-const cerrarDialog = () => {
-    dialog.value = false;
-    document.getElementsByTagName("body")[0].classList.remove("modal-open");
-};
-
 const cerrarFormulario = () => {
     muestra_form.value = false;
+    document.getElementsByTagName("body")[0].classList.remove("modal-open");
 };
 
 const cargarListas = () => {};
 
+const options = ref([]);
+const loading = ref(false);
+const remoteMethod = async (query) => {
+    if (query !== "") {
+        loading.value = true;
+        try {
+            const response = await axios.get(
+                route("personas.listado") +
+                    `?search=${encodeURIComponent(query)}`
+            );
+            const data = response.data.personas;
+            // Suponiendo que data es un array de personas [{id, nombre}]
+            options.value = data.map((persona) => ({
+                value: persona.id,
+                label: `${persona.full_name} - ${persona.ci}`,
+            }));
+        } catch (error) {
+            options.value = [];
+        }
+        loading.value = false;
+    } else {
+        options.value = [];
+    }
+};
 onMounted(() => {
     cargarListas();
 });
@@ -176,174 +210,44 @@ onMounted(() => {
 
         <template #body>
             <form @submit.prevent="enviarFormulario()">
+                <p class="text-muted text-xs mb-0">
+                    Todos los campos con
+                    <span class="text-danger">(*)</span> son obligatorios.
+                </p>
                 <div class="row">
-                    <div class="col-md-4">
-                        <label>Nombre(s)*</label>
-                        <input
-                            type="text"
-                            class="form-control"
+                    <div class="col-md-4 mt-2">
+                        <label class="required"
+                            ><i class="fa fa-search"></i> Buscar Persona
+                        </label>
+                        <el-select-v2
+                            v-model="form.persona_id"
+                            style="width: 240px"
+                            filterable
+                            remote
+                            :remote-method="remoteMethod"
+                            clearable
+                            :options="options"
+                            :loading="loading"
+                            placeholder="Buscar Persona..."
+                            size="large"
+                            no-data-text="Sin resultados"
+                            loading-text="Buscando..."
                             :class="{
-                                'parsley-error': form.errors?.nombre,
+                                'is-invalid': form.errors?.persona_id,
                             }"
-                            v-model="form.nombre"
+                            class="w-100"
                         />
                         <ul
-                            v-if="form.errors?.nombre"
+                            v-if="form.errors?.persona_id"
                             class="parsley-errors-list filled"
                         >
                             <li class="parsley-required">
-                                {{ form.errors?.nombre }}
+                                {{ form.errors?.persona_id }}
                             </li>
                         </ul>
                     </div>
                     <div class="col-md-4 mt-2">
-                        <label>Ap. Paterno*</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.paterno,
-                            }"
-                            v-model="form.paterno"
-                        />
-
-                        <ul
-                            v-if="form.errors?.paterno"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.paterno }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Ap. Materno</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.materno,
-                            }"
-                            v-model="form.materno"
-                        />
-
-                        <ul
-                            v-if="form.errors?.materno"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.materno }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Número de C.I.*</label>
-                        <input
-                            type="number"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.ci,
-                            }"
-                            v-model="form.ci"
-                        />
-
-                        <ul
-                            v-if="form.errors?.ci"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.ci }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Expedido*</label>
-                        <select
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.ci_exp,
-                            }"
-                            v-model="form.ci_exp"
-                        >
-                            <option value="">- Seleccione -</option>
-                            <option
-                                v-for="item in listExpedido"
-                                :value="item.value"
-                            >
-                                {{ item.label }}
-                            </option>
-                        </select>
-                        <ul
-                            v-if="form.errors?.ci_exp"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.ci_exp }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Dirección*</label>
-                        <input
-                            type="email"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.dir,
-                            }"
-                            v-model="form.dir"
-                        />
-
-                        <ul
-                            v-if="form.errors?.dir"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.dir }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Correo electrónico</label>
-                        <input
-                            type="email"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.correo,
-                            }"
-                            v-model="form.correo"
-                        />
-
-                        <ul
-                            v-if="form.errors?.correo"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.correo }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Teléfono/Celular*</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.fono,
-                            }"
-                            v-model="form.fono"
-                        />
-
-                        <ul
-                            v-if="form.errors?.fono"
-                            class="parsley-errors-list filled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.fono }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label>Tipo de Usuario*</label>
+                        <label class="required">Tipo de Usuario</label>
                         <select
                             class="form-control"
                             :class="{
@@ -391,8 +295,7 @@ onMounted(() => {
                         </ul>
                     </div>
                     <div class="col-md-4 mt-2">
-                        <label for="flexSwitchCheckChecked">Acceso*</label
-                        ><br />
+                        <label class="required">Acceso</label><br />
                         <el-switch
                             size="large"
                             v-model="form.acceso"

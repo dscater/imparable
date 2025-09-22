@@ -34,10 +34,11 @@ class PersonaController extends Controller
      *
      * @return JsonResponse
      */
-    public function listado(): JsonResponse
+    public function listado(Request $request): JsonResponse
     {
+        $search = (string)$request->input("search", "");
         return response()->JSON([
-            "personas" => $this->personaService->listado()
+            "personas" => $this->personaService->listado($search)
         ]);
     }
 

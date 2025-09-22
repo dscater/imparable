@@ -98,17 +98,32 @@ const enviarFormulario = () => {
         },
         onError: (err, code) => {
             console.log(code ?? "");
-            const error =
-                "Ocurrió un error inesperado contactese con el Administrador";
-            Swal.fire({
-                icon: "info",
-                title: "Error",
-                html: `<strong>${error}</strong>`,
-                confirmButtonText: `Aceptar`,
-                customClass: {
-                    confirmButton: "btn-error",
-                },
-            });
+            console.log(form.errors);
+            if (form.errors) {
+                const error =
+                    "Existen errores en el formulario, por favor verifique";
+                Swal.fire({
+                    icon: "info",
+                    title: "Error",
+                    html: `<strong>${error}</strong>`,
+                    confirmButtonText: `Aceptar`,
+                    customClass: {
+                        confirmButton: "btn-error",
+                    },
+                });
+            } else {
+                const error =
+                    "Ocurrió un error inesperado contactese con el Administrador";
+                Swal.fire({
+                    icon: "info",
+                    title: "Error",
+                    html: `<strong>${error}</strong>`,
+                    confirmButtonText: `Aceptar`,
+                    customClass: {
+                        confirmButton: "btn-error",
+                    },
+                });
+            }
             console.log("error: " + err.error);
         },
         onFinish: () => {
@@ -132,6 +147,7 @@ const cerrarDialog = () => {
 
 const cerrarFormulario = () => {
     muestra_form.value = false;
+    document.getElementsByTagName("body")[0].classList.remove("modal-open");
 };
 
 const cargarListas = () => {};
@@ -162,12 +178,12 @@ onMounted(() => {
 
         <template #body>
             <form @submit.prevent="enviarFormulario()">
-                <p class="text-muted text-xs">
+                <p class="text-muted text-xs mb-0">
                     Todos los campos con
                     <span class="text-danger">(*)</span> son obligatorios.
                 </p>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4 mt-2">
                         <label class="required">Nombre(s)</label>
                         <input
                             type="text"

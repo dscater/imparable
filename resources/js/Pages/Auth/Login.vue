@@ -69,6 +69,7 @@ onMounted(() => {
                         class="form-control"
                         placeholder="Usuario"
                         v-model="form.usuario"
+                        autofocus
                     />
                     <div class="input-group-append">
                         <div class="input-group-text">

@@ -15,7 +15,7 @@ onBeforeMount(() => {
     appStore.startLoading();
 });
 
-const { setPersona, limpiaPersona } = usePersonas();
+const { setPersona, limpiarPersona } = usePersonas();
 
 const miTable = ref(null);
 
@@ -76,7 +76,7 @@ const accion_formulario = ref(0);
 const muestra_formulario = ref(false);
 
 const agregarRegistro = () => {
-    limpiaPersona();
+    limpiarPersona();
     accion_formulario.value = 0;
     muestra_formulario.value = true;
 };
